@@ -5,7 +5,7 @@ function modreg_register_form_add_field()
 	global $wpdb;
 	// Get existing county/district/school from POST
 //	$county   = array_key_exists('countyselect', $_POST) ? $_POST['countyselect'] : '';
-//    $district = array_key_exists('districtselect', $_POST) ? $_POST["districtselect"] : '';
+//  $district = array_key_exists('districtselect', $_POST) ? $_POST["districtselect"] : '';
 //    $school   = array_key_exists('schoolselect',$_POST) ? $_POST['schoolselect'] : '';
 
   //$publickey = "6LcVs-wSAAAAABmYKVlo4_21h6CWnMg5PNBoSiVu"; // you got this from the signup page
@@ -32,7 +32,7 @@ Last Name <br>
 </div>
 </div>
 <!-- TODO: authentication for international -->
-<?php if(($_GET['role']=='intl')|($_POST['role']=='intl')|($_POST["roleset"]=='intl')): ?>
+<?php if(($_GET['loc']=='intl')|($_POST['loc']=='intl')): ?>
 <div id = "pn" style="display:inline-block; width: 500px">
 Cell or Home Phone Number (including country code)<br>
 <input type = "text" name= "phonenumber" id = "phonenumber" value="<?php echo $_POST["phonenumber"]; ?>" > </input><br>
@@ -52,7 +52,7 @@ City <br>
 <input type = "text" name= "city" id = "city" value="<?php echo $_POST["city"]; ?>"> </input><br>
 </div>
 <!-- international specify state/region in input -->
-<?php if(($_GET['role']=='intl')|($_POST['role']=='intl')|($_POST["roleset"]=='intl')): ?>
+<?php if(($_GET['loc']=='intl')|($_POST['loc']=='intl')): ?>
 <div style="display: table">
 <div> State/Region <br>
 <input type = "text" name= "state/region" id = "region" style="display: table-cell; width:75%" value="<?php echo $_POST["region"]; ?>"> </input><br>
@@ -131,7 +131,7 @@ Postal Code <br>
 </div>
 </div>
 <!-- Country dropdown for international -->
-<?php if(($_GET['role']=='intl')|($_POST['role']=='intl')|($_POST["roleset"]=='intl')): ?>
+<?php if(($_GET['loc']=='intl')|($_POST['loc']=='intl')): ?>
 <div id="country" style="padding-bottom: 20px">
 Country <br>
 <select>
