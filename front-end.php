@@ -14,6 +14,9 @@ function modreg_register_form_add_field()
 
 <br>
 <input type="hidden" name="roleset" id = "roleset" value="<?php if(isset($_POST['role'])){echo $_POST['role'];} else{echo $_POST["roleset"];} ?>"></input>
+<?php if(($_GET['loc']=='intl')|($_POST['locset']=='intl')):?>
+<input type="hidden" name="locset" id = "locset" value="intl"></input>
+<?php endif; ?>
 <?php if(($_GET['role']=='teachers')|($_POST['role']=='teachers')|($_POST["roleset"]=='teachers')): ?>
 <div id="modregplugin" style="position: relative; /*margin-top: -10px;*/">
 <?php else: ?>
@@ -35,7 +38,7 @@ Last Name <br>
 <?php if(($_GET['loc']=='intl')|($_POST['loc']=='intl')): ?>
 <div id = "pn" style="display:inline-block; width: 500px">
 Cell or Home Phone Number (including country code)<br>
-<input type = "text" name= "phonenumber" id = "phonenumber" value="<?php echo $_POST["phonenumber"]; ?>" > </input><br>
+<input type = "text" name= "intlphonenumber" id = "intlphonenumber" value="<?php echo $_POST["intlphonenumber"]; ?>" > </input><br>
 </div>
 <?php else: ?>
 <div id = "pn" style="position: relative; margin-top: -77px; margin-left: 600px;">
@@ -134,7 +137,7 @@ Postal Code <br>
 <?php if(($_GET['loc']=='intl')|($_POST['loc']=='intl')): ?>
 <div id="country" style="padding-bottom: 20px">
 Country <br>
-<select>
+<select name="country" id="country" method="post">
 	<option value="AF">Afghanistan</option>
 	<option value="AX">Åland Islands</option>
 	<option value="AL">Albania</option>
@@ -913,12 +916,15 @@ function modreg_registration_errors( $errors, $sanitized_user_login, $user_email
     if((isset($_POST['role']) and $_POST['role']=='fellows')|$_POST["roleset"]=='fellows'){
         add_action( 'login_head', 'wp_shake_js', 12 );
         return new WP_Error( 'authentication_failed', __('<strong>ERROR</strong>: Unable to register based on current role' , 'baweic' ) );
-    }
+	}
 	//Check user phone number has valid format
-    if(!preg_match("/^([1]-)?[0-9]{3}-[0-9]{3}-[0-9]{4}$/i", $_POST["phonenumber"], $matches)){
-        add_action( 'login_head', 'wp_shake_js', 12 );
-		return new WP_Error( 'authentication_failed', __('<strong>ERROR</strong>: Phone number has letters or input format is incorrect' , 'baweic' ) );
-    }
+	if($_POST['locset'] == null |$_POST['locset'] == null)
+	{
+		if(!preg_match("/^([1]-)?[0-9]{3}-[0-9]{3}-[0-9]{4}$/i", $_POST["phonenumber"], $matches)){
+			add_action( 'login_head', 'wp_shake_js', 12 );
+			return new WP_Error( 'authentication_failed', __('<strong>ERROR</strong>: Phone number has letters or input format is incorrect' , 'baweic' ) );
+		}
+	}
     else if(!preg_match("/^([0-9]{5})(-[0-9]{4})?$/i",$_POST["zipcode"])){//check if zipcode has valid format
         add_action( 'login_head', 'wp_shake_js', 12 );
 		return new WP_Error( 'authentication_failed', __('<strong>ERROR</strong>: Zip code has letters or format is incorrect' , 'baweic' ) );
@@ -1150,10 +1156,18 @@ function modreg_register($user_id){
     }
     $fname = $_POST["firstname"];
     $lname = $_POST["lastname"];
-    $unumber = $_POST["phonenumber"];
-    $uaddress = $_POST["address"];
+	$uaddress = $_POST["address"];
+	// international
+	if($_POST["locset"]=="intl"){
+		$ustate = $_POST["region"];
+		$ucountry = $_POST["country"];
+		$intlpn = $_POST["intlphonenumber"];
+	} else {
+	//domestic
+		$ustate = $_POST["state"];
+		$unumber = $_POST["phonenumber"];
+	}
     $ucity = $_POST["city"];
-    $ustate = $_POST["state"];
     $uzip = $_POST["zipcode"];
     $usub = $_POST["subjects"];
     $usub_NA = $_POST["subjectsNA"];
@@ -1190,7 +1204,12 @@ function modreg_register($user_id){
     $addcollege = $_POST["addcollege"];
 
     wp_update_user( array ('ID' => $user_id, 'role' => $urole,'first_name' => $fname, 'last_name' =>$lname) );
-    add_user_meta( $user_id, 'wp_phone_number', $unumber);
+	if($_POST["locset"]=="intl"){
+		add_user_meta( $user_id, 'wp_intl_phone_number', $intlpn);
+		add_user_meta( $user_id, 'wp_country', $ucountry);
+	} else {
+		add_user_meta( $user_id, 'wp_phone_number', $unumber);
+	}
     add_user_meta( $user_id, 'wp_address', $uaddress);
     add_user_meta( $user_id, 'wp_city', $ucity);
     add_user_meta( $user_id, 'wp_state', $ustate);
