@@ -38,7 +38,7 @@ Last Name <br>
 <?php if(($_GET['loc']=='intl')|($_POST['loc']=='intl')): ?>
 <div id = "pn" style="display:inline-block; width: 500px">
 Cell or Home Phone Number (including country code)<br>
-<input type = "text" name= "intlphonenumber" id = "intlphonenumber" value="<?php echo $_POST["intlphonenumber"]; ?>" > </input><br>
+<input type = "text" name= "phonenumber" id = "phonenumber" value="<?php echo $_POST["phonenumber"]; ?>" > </input><br>
 </div>
 <?php else: ?>
 <div id = "pn" style="position: relative; margin-top: -77px; margin-left: 600px;">
@@ -58,7 +58,7 @@ City <br>
 <?php if(($_GET['loc']=='intl')|($_POST['loc']=='intl')): ?>
 <div style="display: table">
 <div> State/Region <br>
-<input type = "text" name= "state/region" id = "region" style="display: table-cell; width:75%" value="<?php echo $_POST["region"]; ?>"> </input><br>
+<input type = "text" name= "region" id = "region" style="display: table-cell; width:75%" value="<?php echo $_POST["region"]; ?>"> </input><br>
 </div>
 <?php else: ?>
 <div id = "st" style="position:relative; margin-top:-67px; margin-left:300px;">
@@ -128,6 +128,7 @@ State, US Territory, or Military State <br>
 </div>
 <?php endif; ?>
 <!-- <div id="zc" style = "position: relative; margin-top: -51px; margin-left: 600px;"> -->
+<div>
 <div id="zc" style = "display: table-cell; width:25%">
 Postal Code <br>
 <input type = "text" name= "zipcode" id = "zipcode" value="<?php echo $_POST["zipcode"]; ?>"> </input><br>
@@ -923,12 +924,11 @@ function modreg_registration_errors( $errors, $sanitized_user_login, $user_email
 		if(!preg_match("/^([1]-)?[0-9]{3}-[0-9]{3}-[0-9]{4}$/i", $_POST["phonenumber"], $matches)){
 			add_action( 'login_head', 'wp_shake_js', 12 );
 			return new WP_Error( 'authentication_failed', __('<strong>ERROR</strong>: Phone number has letters or input format is incorrect' , 'baweic' ) );
+		} else if(!preg_match("/^([0-9]{5})(-[0-9]{4})?$/i",$_POST["zipcode"])){//check if zipcode has valid format
+			add_action( 'login_head', 'wp_shake_js', 12 );
+			return new WP_Error( 'authentication_failed', __('<strong>ERROR</strong>: Zip code has letters or format is incorrect' , 'baweic' ) );
 		}
 	}
-    else if(!preg_match("/^([0-9]{5})(-[0-9]{4})?$/i",$_POST["zipcode"])){//check if zipcode has valid format
-        add_action( 'login_head', 'wp_shake_js', 12 );
-		return new WP_Error( 'authentication_failed', __('<strong>ERROR</strong>: Zip code has letters or format is incorrect' , 'baweic' ) );
-    }
     else if($_POST["firstname"] == ''){ //make sure first name is not blank
         add_action( 'login_head', 'wp_shake_js', 12 );
 		return new WP_Error( 'authentication_failed', __('<strong>ERROR</strong>: Please enter your first name.' , 'baweic' ) );
@@ -1159,16 +1159,15 @@ function modreg_register($user_id){
 	$uaddress = $_POST["address"];
 	// international
 	if($_POST["locset"]=="intl"){
-		$ustate = $_POST["region"];
+		$uregion = $_POST["region"];
 		$ucountry = $_POST["country"];
-		$intlpn = $_POST["intlphonenumber"];
 	} else {
 	//domestic
 		$ustate = $_POST["state"];
-		$unumber = $_POST["phonenumber"];
 	}
+	$unumber = $_POST["phonenumber"];
+	$uzip = $_POST["zipcode"];
     $ucity = $_POST["city"];
-    $uzip = $_POST["zipcode"];
     $usub = $_POST["subjects"];
     $usub_NA = $_POST["subjectsNA"];
     $ugradesteach = $_POST["grades"];
@@ -1204,15 +1203,19 @@ function modreg_register($user_id){
     $addcollege = $_POST["addcollege"];
 
     wp_update_user( array ('ID' => $user_id, 'role' => $urole,'first_name' => $fname, 'last_name' =>$lname) );
+	// international
 	if($_POST["locset"]=="intl"){
-		add_user_meta( $user_id, 'wp_intl_phone_number', $intlpn);
+		add_user_meta( $user_id, 'wp_phone_number', $unumber);
+		add_user_meta( $user_id, 'wp_region', $uregion);
 		add_user_meta( $user_id, 'wp_country', $ucountry);
+
+	//domestic
 	} else {
 		add_user_meta( $user_id, 'wp_phone_number', $unumber);
+		add_user_meta( $user_id, 'wp_state', $ustate);
 	}
     add_user_meta( $user_id, 'wp_address', $uaddress);
     add_user_meta( $user_id, 'wp_city', $ucity);
-    add_user_meta( $user_id, 'wp_state', $ustate);
     add_user_meta( $user_id, 'wp_zipcode', $uzip);
     add_user_meta( $user_id, 'wp_title', $utitle);
     if (!$usub_NA)
@@ -1333,7 +1336,7 @@ function modreg_register($user_id){
             $collegeresults=$wpdb->get_var($wpdb->prepare("SELECT institution_name FROM `wp_colleges` WHERE institutionID_DB = %d;", $collegeID));
             $cityresults=$wpdb->get_var($wpdb->prepare("SELECT city FROM `wp_cities` WHERE cityID = %d;", $cityID));
 
-        }
+        } 
 
         add_user_meta( $user_id, 'wp_school_id', $collegeID );
         add_user_meta( $user_id, 'wp_city_id', $cityID );
