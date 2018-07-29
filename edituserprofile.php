@@ -428,7 +428,7 @@ function custom_profile_fields( $user )
 $userrole = "0";
 if ( !empty( $user->roles ) && is_array( $user->roles ) ) {
     foreach ( $user->roles as $role ){
-    	if($role == 'teachers' || $role == 'fellows' || $role =='cstemteachers'|| $role =='roboticsteachers'){
+    	if($role == 'teachers' || $role == 'fellows' || $role =='cstemteachers'|| $role =='roboticsteachers' ||$role == 'intl'){
 			$userrole = "1";
 		}
 		if($role == 'itstaff'){
