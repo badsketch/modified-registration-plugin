@@ -1156,7 +1156,11 @@ function modreg_register($user_id){
     $lname = $_POST["lastname"];
 	$uaddress = $_POST["address"];
 	// international
+<<<<<<< HEAD
 	if($_POST["role"]=="intl"){
+=======
+	if($_POST["locset"]=="intl"){
+>>>>>>> 75a22e86b5245a800cb5624849b3af085c2b0a9c
 		$uregion = $_POST["region"];
 		$ucountry = $_POST["country"];
 	} else {
@@ -1202,7 +1206,11 @@ function modreg_register($user_id){
 
     wp_update_user( array ('ID' => $user_id, 'role' => $urole,'first_name' => $fname, 'last_name' =>$lname) );
 	// international
+<<<<<<< HEAD
 	if($_POST["role"]=="intl"){
+=======
+	if($_POST["locset"]=="intl"){
+>>>>>>> 75a22e86b5245a800cb5624849b3af085c2b0a9c
 		add_user_meta( $user_id, 'wp_phone_number', $unumber);
 		add_user_meta( $user_id, 'wp_region', $uregion);
 		add_user_meta( $user_id, 'wp_country', $ucountry);
