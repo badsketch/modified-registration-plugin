@@ -35,7 +35,7 @@ Last Name <br>
 </div>
 </div>
 <!-- TODO: authentication for international -->
-<?php if(($_GET['loc']=='intl')|($_POST['loc']=='intl')): ?>
+<?php if(($_GET['role']=='intl')|($_POST['role']=='intl')): ?>
 <div id = "pn" style="display:inline-block; width: 500px">
 Cell or Home Phone Number (including country code)<br>
 <input type = "text" name= "phonenumber" id = "phonenumber" value="<?php echo $_POST["phonenumber"]; ?>" > </input><br>
@@ -55,7 +55,7 @@ City <br>
 <input type = "text" name= "city" id = "city" value="<?php echo $_POST["city"]; ?>"> </input><br>
 </div>
 <!-- international specify state/region in input -->
-<?php if(($_GET['loc']=='intl')|($_POST['loc']=='intl')): ?>
+<?php if(($_GET['role']=='intl')|($_POST['role']=='intl')): ?>
 <div style="display: table">
 <div> State/Region <br>
 <input type = "text" name= "region" id = "region" style="display: table-cell; width:75%" value="<?php echo $_POST["region"]; ?>"> </input><br>
@@ -135,7 +135,7 @@ Postal Code <br>
 </div>
 </div>
 <!-- Country dropdown for international -->
-<?php if(($_GET['loc']=='intl')|($_POST['loc']=='intl')): ?>
+<?php if(($_GET['role']=='intl')|($_POST['role']=='intl')): ?>
 <div id="country" style="padding-bottom: 20px">
 Country <br>
 <select name="country" id="country" method="post">
@@ -919,7 +919,7 @@ function modreg_registration_errors( $errors, $sanitized_user_login, $user_email
         return new WP_Error( 'authentication_failed', __('<strong>ERROR</strong>: Unable to register based on current role' , 'baweic' ) );
 	}
 	//Check user phone number has valid format
-	if($_POST['locset'] == null |$_POST['locset'] == null)
+	if($_POST['role'] != 'intl' |$_POST['role'] != 'intl')
 	{
 		if(!preg_match("/^([1]-)?[0-9]{3}-[0-9]{3}-[0-9]{4}$/i", $_POST["phonenumber"], $matches)){
 			add_action( 'login_head', 'wp_shake_js', 12 );
@@ -1158,7 +1158,7 @@ function modreg_register($user_id){
     $lname = $_POST["lastname"];
 	$uaddress = $_POST["address"];
 	// international
-	if($_POST["locset"]=="intl"){
+	if($_POST["role"]=="intl"){
 		$uregion = $_POST["region"];
 		$ucountry = $_POST["country"];
 	} else {
@@ -1204,7 +1204,7 @@ function modreg_register($user_id){
 
     wp_update_user( array ('ID' => $user_id, 'role' => $urole,'first_name' => $fname, 'last_name' =>$lname) );
 	// international
-	if($_POST["locset"]=="intl"){
+	if($_POST["role"]=="intl"){
 		add_user_meta( $user_id, 'wp_phone_number', $unumber);
 		add_user_meta( $user_id, 'wp_region', $uregion);
 		add_user_meta( $user_id, 'wp_country', $ucountry);
